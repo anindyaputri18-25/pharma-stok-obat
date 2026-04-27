@@ -8,14 +8,12 @@ if (!isset($_SESSION['initiated'])) {
     session_regenerate_id(true);
     $_SESSION['initiated'] = true;
 }
-
+// Ganti bagian pengecekan ini di autentikasi.php
 $current_page = basename($_SERVER['PHP_SELF']);
 
-// Jika belum login (session users kosong)
 if (!isset($_SESSION['users'])) {
-    // Tambahkan pengecekan agar tidak loop saat di login/register
-    if ($current_page !== 'login.php' && $current_page !== 'register.php' && $current_page !== 'index.html') {
-        // Gunakan /login agar ditangkap oleh route vercel.json menuju /api/login.php
+    // Pakai strpos agar lebih aman mendeteksi apakah kita di login atau register
+    if (strpos($current_page, 'login') === false && strpos($current_page, 'register') === false && $current_page !== 'index.html') {
         header("Location: /login");
         exit();
     }

@@ -6,24 +6,36 @@
   },
   "routes": [
     {
-      "src": "/api/(.*)\\.php",
-      "dest": "/api/$1.php"
-    },
-    {
       "src": "/api/script_api.js",
       "dest": "/api/script_api.js"
     },
     {
-      "src": "/api/([^./]+)$",
+      "src": "/login",
+      "dest": "/api/login.php"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/api/dashboard.php"
+    },
+    {
+      "src": "/kasir_dashboard",
+      "dest": "/api/kasir_dashboard.php"
+    },
+    {
+      "src": "/pending",
+      "dest": "/api/pending.php"
+    },
+    {
+      "src": "/api/(.*)\\.php",
+      "dest": "/api/$1.php"
+    },
+    {
+      "src": "/(.*)",
       "dest": "/api/$1.php"
     },
     {
       "src": "/",
       "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/$1"
     }
   ]
 }

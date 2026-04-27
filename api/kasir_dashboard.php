@@ -5,7 +5,7 @@ include 'autentikasi.php';
 
 // Hanya Kasir
 if ($role != 'Kasir') {
-    header("Location: dashboard.php");
+    header("Location: /dashboard");
     exit();
 }
 
