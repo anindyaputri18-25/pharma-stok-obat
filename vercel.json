@@ -2,6 +2,9 @@
   "functions": {
     "api/*.php": {
       "runtime": "vercel-php@0.7.2"
+    },
+    "*.php": {
+      "runtime": "vercel-php@0.7.2"
     }
   },
   "routes": [
@@ -16,6 +19,26 @@
     {
       "src": "/api/([^./]+)$",
       "dest": "/api/$1.php"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/login.php"
+    },
+    {
+      "src": "/register",
+      "dest": "/register.php"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/dashboard.php"
+    },
+    {
+      "src": "/(.*)\\.php",
+      "dest": "/$1.php"
     },
     {
       "src": "/(.*)",
