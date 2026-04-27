@@ -2,7 +2,7 @@
 session_start();
 include 'koneksi.php';
 
-// Jika sudah login, langsung lempar ke dashboard
+// Cek jika sudah login
 if (isset($_SESSION['users'])) {
     if ($_SESSION['role'] === 'Pending') {
         header("Location: /pending");
@@ -29,13 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = $result->fetch_assoc();
 
         if (password_verify($password, $data['password'])) {
-            // SET SESSION SECURELY
             $_SESSION['users'] = $data['username'];
             $_SESSION['role']  = $data['role'];
             
             session_regenerate_id(true);
 
-            // REDIRECT BERDASARKAN ROLE (Gunakan "/" agar sesuai route Vercel)
             if ($data['role'] === 'Pending') {
                 header("Location: /pending");
             } elseif ($data['role'] === 'Kasir') {

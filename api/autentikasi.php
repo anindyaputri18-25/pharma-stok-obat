@@ -8,12 +8,11 @@ if (!isset($_SESSION['initiated'])) {
     $_SESSION['initiated'] = true;
 }
 
-// CARA PALING AMAN UNTUK VERCEL:
-// Kita cek apakah URL saat ini mengandung kata 'login' atau 'register'
+// Mengambil URL saat ini untuk pengecekan halaman
 $current_url = $_SERVER['REQUEST_URI'];
 
 if (!isset($_SESSION['users'])) {
-    // Jika tidak ada session, dan TIDAK sedang di halaman login/register/index
+    // Jika tidak ada session, dan tidak sedang di halaman login/register/index
     if (strpos($current_url, 'login') === false && 
         strpos($current_url, 'register') === false && 
         $current_url !== '/' && 
@@ -26,7 +25,7 @@ if (!isset($_SESSION['users'])) {
     $role_saat_ini = $_SESSION['role'] ?? null;
     $users = $_SESSION['users'] ?? null;
 
-    // Jika SUDAH login tapi malah buka halaman login/register
+    // Cegah user yang sudah login mengakses halaman login/register kembali
     if (strpos($current_url, 'login') !== false || strpos($current_url, 'register') !== false) {
         if ($role_saat_ini === 'Pending') {
             header("Location: /pending");
