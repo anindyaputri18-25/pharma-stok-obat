@@ -21,7 +21,6 @@ if ($role_saat_ini == 'Kasir') {
 $users = $_SESSION['users'];
 $role  = $role_saat_ini;
 
-// Statistik stok (FIX: variabel ini sebelumnya tidak dihitung)
 $stok_aman    = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM medicines WHERE jumlah > 15"));
 $stok_menipis = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM medicines WHERE jumlah > 0 AND jumlah <= 15"));
 $stok_habis   = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM medicines WHERE jumlah <= 0"));
