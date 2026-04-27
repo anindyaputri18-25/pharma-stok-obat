@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharma Stock - Sistem Monitoring Apotek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spin-slow 15s linear infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans overflow-x-hidden">
+
+    <nav class="flex justify-between items-center px-6 md:px-20 py-6 bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="bg-blue-600 p-2 rounded-lg">
+                <i class="fas fa-pills text-white"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-black text-blue-600 tracking-tighter">PHARMA<span class="text-slate-800">STOCK</span></h1>
+        </div>
+        <div class="hidden md:flex space-x-8 items-center">
+            <a href="api/login.php" class="text-slate-600 font-bold hover:text-blue-600 transition">Masuk</a>
+            <a href="api/register.php" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition active:scale-95">Daftar Sekarang</a>
+        </div>
+    </nav>
+
+    <header class="container mx-auto px-6 md:px-20 py-16 md:py-24 flex flex-col md:flex-row items-center gap-16 relative">
+        
+        <div class="absolute top-20 right-0 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div class="absolute bottom-10 right-20 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+
+        <div class="flex-1 z-10">
+            <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-2 rounded-full mb-6">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <span class="text-blue-700 text-xs font-bold uppercase tracking-widest">Update Versi 2.0 Tersedia</span>
+            </div>
+            
+            <h2 class="text-5xl md:text-7xl font-black text-slate-800 leading-tight">
+                Monitoring Stok <br> 
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 text-blue-600">Obat & Alat Kesehatan</span> <br> 
+                Real-Time.
+            </h2>
+            <p class="text-slate-500 mt-8 text-lg max-w-lg leading-relaxed">
+                Kelola ribuan data obat, pantau tanggal kadaluarsa, dan buat laporan otomatis hanya dalam satu dashboard yang aman dan terintegrasi.
+            </p>
+            
+            <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                <a href="api/register.php" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold hover:bg-black transition shadow-2xl flex items-center justify-center gap-3 active:scale-95">
+                    Mulai Sekarang 
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </a>
+                <div class="flex items-center gap-3 px-6 py-4 justify-center">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg border border-slate-100 cursor-pointer hover:text-blue-600 transition">
+                        <i class="fas fa-play text-xs"></i>
+                    </div>
+                    <span class="font-bold text-slate-700">Lihat Demo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex justify-center relative">
+            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 rounded-full scale-110 blur-2xl"></div>
+            
+            <div class="absolute -top-4 -left-4 w-20 h-20 bg-blue-600/10 rounded-2xl animate-spin-slow"></div>
+            <div class="absolute -bottom-4 -right-4 w-16 h-16 bg-indigo-600/10 rounded-full"></div>
+
+            <div class="flex-1 flex justify-center relative z-10">
+                <img src="https://img.freepik.com/premium-vector/pharmacy-store-retail-clinic-drugstore-customer-waiting-line-medical-seller-pharmacist-woman-buy-medications-tablets-recent-vector-scene-drugstore-retail-illustration_543062-7331.jpg?w=2000" 
+                    class="w-full max-w-lg float-anim drop-shadow-2xl" 
+                    alt="Ilustrasi Apotek Modern">
+            </div>
+    </header>
+
+    <section class="bg-white py-24 border-t border-slate-100 relative">
+        <div class="container mx-auto px-6 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-blue-100 transition-all duration-500 group">
+                <div class="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-colors duration-500">
+                    <i class="fas fa-database text-blue-600 text-2xl group-hover:text-white"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-slate-800 mb-4">Database Terpusat</h4>
+                <p class="text-slate-500 leading-relaxed">Semua data tersimpan aman di MySQL PHPMyAdmin, akses kapan saja di mana saja dengan enkripsi data.</p>
+            </div>
+
+            <div class="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-orange-100 transition-all duration-500 group">
+                <div class="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center mb-8 group-hover:bg-orange-500 transition-colors duration-500">
+                    <i class="fas fa-bell text-orange-500 text-2xl group-hover:text-white"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-slate-800 mb-4">Notifikasi Expired</h4>
+                <p class="text-slate-500 leading-relaxed">Sistem otomatis mendeteksi obat yang hampir kadaluarsa untuk keamanan pasien secara proaktif.</p>
+            </div>
+
+            <div class="p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:shadow-green-100 transition-all duration-500 group">
+                <div class="w-16 h-16 bg-white shadow-sm rounded-2xl flex items-center justify-center mb-8 group-hover:bg-green-500 transition-colors duration-500">
+                    <i class="fas fa-chart-line text-green-500 text-2xl group-hover:text-white"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-slate-800 mb-4">Laporan Akurat</h4>
+                <p class="text-slate-500 leading-relaxed">Cetak laporan stok masuk dan keluar dengan satu kali klik untuk analisis bisnis yang lebih baik.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center border-t border-slate-100 bg-slate-50">
+        <div class="flex justify-center gap-6 mb-6 text-slate-400">
+            <i class="fab fa-facebook hover:text-blue-600 cursor-pointer transition"></i>
+            <i class="fab fa-instagram hover:text-pink-500 cursor-pointer transition"></i>
+            <i class="fab fa-twitter hover:text-blue-400 cursor-pointer transition"></i>
+        </div>
+        <p class="text-slate-400 text-sm font-medium uppercase tracking-widest">&copy; 2024 Pharma Stock System. Build with ❤️ for Better Healthcare.</p>
+    </footer>
+
+</body>
+</html>
