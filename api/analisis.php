@@ -1,13 +1,15 @@
 <?php
 include 'koneksi.php';
-include 'autentikasi.php'; // Ini akan otomatis mendefinisikan $role_saat_ini dan $users
+include 'autentikasi.php'; 
 
-$users = $_COOKIE['users']; // Ambil dari cookie
-$role  = $role_saat_ini;    // Ambil dari variabel di autentikasi.php
+$users = $_COOKIE['users'] ?? ''; 
+$role  = $role_saat_ini;    
 
-$role_boleh = ['Admin', 'Manager Gudang'];
+// Tambahkan 'Kasir' dan 'Apoteker' ke dalam array ini
+$role_boleh = ['Admin', 'Manager Gudang', 'Kasir', 'Apoteker'];
+
 if (!in_array($role, $role_boleh)) {
-    echo "<script>alert('Akses Ditolak!'); window.location='dashboard.php';</script>";
+    echo "<script>alert('Akses Ditolak! Role Anda ($role) tidak memiliki izin.'); window.location='dashboard.php';</script>";
     exit();
 }
 ?>
