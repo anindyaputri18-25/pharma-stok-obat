@@ -18,7 +18,7 @@ if ($role_saat_ini == 'Kasir') {
     exit();
 }
 
-$users = $_SESSION['users'];
+$users = $_COOKIE['users'];
 $role  = $role_saat_ini;
 
 $stok_aman    = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM medicines WHERE jumlah > 15"));

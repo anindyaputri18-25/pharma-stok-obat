@@ -3,8 +3,8 @@ session_start();
 include 'koneksi.php';
 
 // Cek jika sudah login, langsung lempar ke dashboard masing-masing
-if (isset($_SESSION['users'])) {
-    $role = $_SESSION['role'];
+if (isset($_COOKIE['users'])) {
+    $role = $_COOKIE['role'];
     if ($role === 'Pending') {
         header("Location: pending.php");
     } elseif ($role === 'Kasir') {
@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Verifikasi password (asumsi password di database sudah di-hash dengan password_hash)
         if (password_verify($password, $data['password'])) {
-            // Set session data
-            $_SESSION['users'] = $data['username'];
-            $_SESSION['role']  = $data['role'];
+            // Set Cookie data selama 1 hari (86400 detik)
+            setcookie('users', $data['username'], time() + 86400, "/");
+            setcookie('role', $data['role'], time() + 86400, "/");
 
             session_regenerate_id(true);
 

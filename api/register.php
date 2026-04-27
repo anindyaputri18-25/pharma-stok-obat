@@ -2,7 +2,7 @@
 session_start();
 include 'koneksi.php';
 
-if (isset($_SESSION['users'])) {
+if (isset($_COOKIE['users'])) {
     header("Location: dashboard.php");
     exit();
 }
