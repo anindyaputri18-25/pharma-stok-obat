@@ -214,43 +214,46 @@ if (!in_array($role, $role_boleh)) {
 
     <script>
         async function muatDataBPS() {
-            try {
-                const response = await fetch('api_bps.php'); // Jika analisis.php & api_bps.php di satu folder
-                const data = await response.json();
+            const tableContainer = document.getElementById('bpsTableContainer');
+            const tableContent = document.getElementById('bpsTableContent');
 
-                // 2. Cek apakah status OK
+            try {
+                const response = await fetch('api_bps.php');
+                const result = await response.json(); // Gunakan nama variabel 'result' agar sinkron dengan baris bawahnya
+
                 if (result.status === "OK") {
+                    // Sesuai struktur API BPS: data ada di result.data.table
                     let htmlTabel = result.data.table;
 
                     if (htmlTabel) {
-                        // A. Trik untuk melakukan 'Decode' (menerjemahkan teks BPS kembali menjadi kode HTML asli)
+                        // Decode HTML entities
                         const textarea = document.createElement("textarea");
                         textarea.innerHTML = htmlTabel;
                         let decodedHTML = textarea.value;
 
-                        // B. Masukkan kode utuh tersebut ke dalam iframe agar tidak merusak desain web utama
-                        // Kita replace tanda kutip (") menjadi (&quot;) agar tidak memotong tag srcdoc
+                        // Masukkan ke iframe
                         const iframeHTML = `<iframe 
-                            style="width: 100%; height: 550px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: white;" 
+                            style="width: 100%; height: 550px; border: none; background-color: white;" 
                             srcdoc="${decodedHTML.replace(/"/g, '&quot;')}">
                         </iframe>`;
 
-                        // Munculkan ke layar
                         tableContent.innerHTML = iframeHTML;
                         tableContainer.classList.remove('hidden');
-                        
                     } else {
-                        tableContent.innerHTML = "<p class='text-red-500'>Data tabel tidak ditemukan dalam respon API.</p>";
+                        tableContent.innerHTML = "<p class='p-4 text-red-500'>Data tabel kosong dari BPS.</p>";
+                        tableContainer.classList.remove('hidden');
                     }
                 } else {
-                    tableContent.innerHTML = "<p class='text-red-500'>API BPS mengembalikan error.</p>";
+                    tableContent.innerHTML = `<p class='p-4 text-red-500 font-bold'>Gagal: ${result.message}</p>`;
+                    tableContainer.classList.remove('hidden');
                 }
             } catch (error) {
                 console.error("Error:", error);
+                tableContent.innerHTML = "<p class='p-4 text-red-500'>Terjadi kesalahan koneksi ke API.</p>";
+                tableContainer.classList.remove('hidden');
             }
         }
 
-        // Jalankan saat halaman siap
         window.onload = muatDataBPS;
     </script>
 </body>

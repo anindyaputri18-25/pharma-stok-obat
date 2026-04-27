@@ -1,5 +1,5 @@
 <?php
-include 'koneksi';
+include 'koneksi.php';
 include 'autentikasi.php';
 // api_bps.php
 header('Content-Type: application/json');

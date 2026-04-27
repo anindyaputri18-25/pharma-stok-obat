@@ -10,31 +10,29 @@ $today        = date('Y-m-d');
 $warning_date = date('Y-m-d', strtotime('+30 days'));
 
 if (isset($_POST['tambah_obat'])) {
-    $exp  = $_POST['expired']; // Pastikan di form input name="expired"
-
-    $query = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
-              VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
-
+    // 1. Ambil & Bersihkan Input (Sanitasi)
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
     $qty  = (int)$_POST['jumlah'];
-    $exp  = $_POST['expired']; // Sesuaikan dengan name="expired" di form HTML
+    $exp  = $_POST['expired']; 
     $supp = mysqli_real_escape_string($koneksi, $_POST['supplier']);
     $wa   = mysqli_real_escape_string($koneksi, $_POST['wa_supplier']);
 
+    // 2. Cek apakah nama obat sudah ada
     $cek_nama = mysqli_query($koneksi, "SELECT id FROM medicines WHERE LOWER(nama_obat) = LOWER('$nama')");
+    
     if (mysqli_num_rows($cek_nama) > 0) {
         echo "<script>alert('Gagal! Nama obat [$nama] sudah ada.'); window.location='stok_obat.php';</script>";
-        exit();
-    }
-
-    $query_insert = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
-                    VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
-
-    if (mysqli_query($koneksi, $query_insert)) {
-        echo "<script>alert('Data obat berhasil ditambahkan!'); window.location='stok_obat.php';</script>";
     } else {
-        echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+        // 3. Jalankan Query Insert (Hanya satu kali)
+        $query_insert = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
+                        VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
+
+        if (mysqli_query($koneksi, $query_insert)) {
+            echo "<script>alert('Data obat berhasil ditambahkan!'); window.location='stok_obat.php';</script>";
+        } else {
+            echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+        }
     }
 }
 
