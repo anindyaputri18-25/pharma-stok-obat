@@ -10,31 +10,31 @@
       "dest": "/api/script_api.js"
     },
     {
-      "src": "/",
+      "src": "/index.html",
       "dest": "/index.html"
     },
     {
-      "src": "/login",
+      "src": "/api/login.php",
       "dest": "/api/login.php"
     },
     {
-      "src": "/register",
+      "src": "/api/register.php",
       "dest": "/api/register.php"
     },
     {
-      "src": "/dashboard",
+      "src": "/api/dashboard.php",
       "dest": "/api/dashboard.php"
     },
     {
-      "src": "/kasir_dashboard",
+      "src": "/api/kasir_dashboard.php",
       "dest": "/api/kasir_dashboard.php"
     },
     {
-      "src": "/pending",
+      "src": "/api/pending.php",
       "dest": "/api/pending.php"
     },
     {
-      "src": "/logout",
+      "src": "/api/logout.php",
       "dest": "/api/logout.php"
     },
     {
