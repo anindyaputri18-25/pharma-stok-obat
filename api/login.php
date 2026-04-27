@@ -5,11 +5,11 @@ include 'koneksi.php';
 // Jika sudah login, langsung lempar ke dashboard
 if (isset($_SESSION['users'])) {
     if ($_SESSION['role'] === 'Pending') {
-        header("Location: pending.php");
+        header("Location: /pending");
     } elseif ($_SESSION['role'] === 'Kasir') {
-        header("Location: kasir_dashboard.php");
+        header("Location: /kasir_dashboard");
     } else {
-        header("Location: dashboard.php");
+        header("Location: /dashboard");
     }
     exit();
 }
@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             session_regenerate_id(true);
 
-            // REDIRECT BERDASARKAN ROLE
+            // REDIRECT BERDASARKAN ROLE (Gunakan "/" agar sesuai route Vercel)
             if ($data['role'] === 'Pending') {
-                header("Location: pending.php");
+                header("Location: /pending");
             } elseif ($data['role'] === 'Kasir') {
-                header("Location: kasir_dashboard.php");
+                header("Location: /kasir_dashboard");
             } else {
-                header("Location: dashboard.php");
+                header("Location: /dashboard");
             }
             exit();
         } else {
