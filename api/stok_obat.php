@@ -1,17 +1,22 @@
 <?php
 session_start();
 include 'koneksi.php';
-include 'autentikasi.php'; 
+include 'autentikasi.php';
 
 $users = $_SESSION['users'];
-$role = $role_saat_ini; 
+$role  = $role_saat_ini;
 
+// FIX: variabel tanggal yang hilang di versi original
+$today        = date('Y-m-d');
+$warning_date = date('Y-m-d', strtotime('+30 days'));
+
+// Tambah obat
 if (isset($_POST['tambah_obat'])) {
     if ($role == 'Kasir') {
         echo "<script>alert('Akses Ditolak! Role Anda tidak diizinkan menambah data.'); window.location='stok_obat.php';</script>";
         exit();
     }
-    
+
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
     $qty  = (int)$_POST['jumlah'];
@@ -19,24 +24,27 @@ if (isset($_POST['tambah_obat'])) {
     $supp = mysqli_real_escape_string($koneksi, $_POST['supplier']);
     $wa   = mysqli_real_escape_string($koneksi, $_POST['wa_supplier']);
 
-    $cek_nama = mysqli_query($koneksi, "SELECT * FROM medicines WHERE LOWER(nama_obat) = LOWER('$nama')");
+    $cek_nama = mysqli_query($koneksi, "SELECT id FROM medicines WHERE LOWER(nama_obat) = LOWER('$nama')");
     if (mysqli_num_rows($cek_nama) > 0) {
         echo "<script>alert('Gagal! Nama obat [$nama] sudah ada.'); window.location='stok_obat.php';</script>";
         exit();
+    }
+
+    $sql = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier)
+            VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
+
+    if (mysqli_query($koneksi, $sql)) {
+        echo "<script>alert('Obat baru berhasil disimpan!'); window.location='stok_obat.php';</script>";
+        exit();
     } else {
-        $sql = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
-                VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
-        
-        if (mysqli_query($koneksi, $sql)) {
-            echo "<script>alert('Obat baru berhasil disimpan!'); window.location='stok_obat.php';</script>";
-            exit();
-        }
+        echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
     }
 }
 
+// Hapus obat
 if (isset($_GET['hapus'])) {
-    if ($role == 'Admin') { 
-        $id = $_GET['hapus'];
+    if ($role == 'Admin') {
+        $id = (int)$_GET['hapus'];
         mysqli_query($koneksi, "DELETE FROM medicines WHERE id='$id'");
         header("Location: stok_obat.php");
         exit();
@@ -46,7 +54,6 @@ if (isset($_GET['hapus'])) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,29 +64,9 @@ if (isset($_GET['hapus'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f4f7fe;
-            font-size: 13px;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f7fe; font-size: 13px; }
         * { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .smooth-shadow {
-            box-shadow: 0 10px 30px rgba(139, 153, 178, 0.1);
-        }
-
+        .smooth-shadow { box-shadow: 0 10px 30px rgba(139,153,178,0.1); }
         .nav-text { font-size: 12px; letter-spacing: 0.02em; }
     </style>
 </head>
@@ -89,48 +76,39 @@ if (isset($_GET['hapus'])) {
         <div class="mb-10 w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
             <i class="fas fa-pills text-lg"></i>
         </div>
-        
         <nav class="flex flex-col gap-2 w-full px-4 font-bold h-full nav-text">
             <a href="<?php echo ($role == 'Kasir') ? 'kasir_dashboard.php' : 'dashboard.php'; ?>" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
-                <i class="fas fa-home w-5 text-center"></i> <span class="hidden md:inline ml-3">Beranda</span>
+                <i class="fas fa-home w-5 text-center"></i><span class="hidden md:inline ml-3">Beranda</span>
             </a>
-            
             <a href="stok_obat.php" class="flex items-center justify-center md:justify-start p-3 bg-blue-600 text-white rounded-xl shadow-xl shadow-blue-100 transition">
-                <i class="fas fa-box w-5 text-center"></i> <span class="hidden md:inline ml-3">Stok Obat</span>
+                <i class="fas fa-box w-5 text-center"></i><span class="hidden md:inline ml-3">Stok Obat</span>
             </a>
-
             <?php if (in_array($role, ['Admin', 'Apoteker'])) : ?>
-                <a href="racikan_obat.php" class="flex items-center justify-center md:justify-start p-3 <?php echo (basename($_SERVER['PHP_SELF']) == 'racikan_obat.php') ? 'bg-blue-600 text-white shadow-xl shadow-blue-100' : 'text-slate-400 hover:bg-slate-50 hover:text-blue-600'; ?> rounded-xl transition">
-                    <i class="fas fa-mortar-pestle w-5 text-center"></i> 
-                    <span class="hidden md:inline ml-3">Racikan Obat</span>
-                </a>
+            <a href="racikan_obat.php" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
+                <i class="fas fa-mortar-pestle w-5 text-center"></i><span class="hidden md:inline ml-3">Racikan Obat</span>
+            </a>
             <?php endif; ?>
-
             <?php if (in_array($role, ['Admin', 'Manager Gudang', 'Apoteker', 'Kasir'])) : ?>
             <a href="analisis.php" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
-                <i class="fas fa-chart-bar w-5 text-center"></i> <span class="hidden md:inline ml-3">Analisis</span>
+                <i class="fas fa-chart-bar w-5 text-center"></i><span class="hidden md:inline ml-3">Analisis</span>
             </a>
             <?php endif; ?>
-
             <?php if (in_array($role, ['Admin', 'Manager Gudang'])) : ?>
             <a href="laporan.php" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
-                <i class="fas fa-file-alt w-5 text-center"></i> <span class="hidden md:inline ml-3">Laporan</span>
+                <i class="fas fa-file-alt w-5 text-center"></i><span class="hidden md:inline ml-3">Laporan</span>
             </a>
             <?php endif; ?>
-
             <?php if ($role == 'Admin') : ?>
             <a href="admin_users.php" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
-                <i class="fas fa-users-cog w-5 text-center"></i> <span class="hidden md:inline ml-3">User Management</span>
+                <i class="fas fa-users-cog w-5 text-center"></i><span class="hidden md:inline ml-3">User Management</span>
             </a>
             <?php endif; ?>
-
             <div class="mt-auto flex flex-col gap-2">
                 <a href="profil.php" class="flex items-center justify-center md:justify-start p-3 text-slate-400 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition">
-                    <i class="fas fa-users w-5 text-center"></i> <span class="hidden md:inline ml-3">Profil</span>
+                    <i class="fas fa-user w-5 text-center"></i><span class="hidden md:inline ml-3">Profil</span>
                 </a>
-
                 <a href="logout.php" class="flex items-center justify-center md:justify-start p-3 text-red-500 hover:bg-red-50 rounded-xl transition">
-                    <i class="fas fa-sign-out-alt w-5 text-center"></i> <span class="hidden md:inline ml-3">Keluar</span>
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i><span class="hidden md:inline ml-3">Keluar</span>
                 </a>
             </div>
         </nav>
@@ -140,127 +118,71 @@ if (isset($_GET['hapus'])) {
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div class="text-left">
                 <p class="text-blue-600 font-extrabold text-[9px] uppercase tracking-[0.3em] mb-1">Inventory Control</p>
-                <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none italic">Stok <span class="text-blue-600">Obat.</span></h1>
+                <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none italic">Manajemen <span class="text-blue-600">Stok.</span></h1>
             </div>
-            
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="relative w-full md:w-72 group">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 text-xs transition"></i>
-                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari obat..." 
-                    class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 rounded-full outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm text-xs font-medium">
+            <div class="flex items-center gap-3 bg-white p-1.5 rounded-full border border-slate-100 smooth-shadow shrink-0">
+                <div class="flex flex-col items-end px-3">
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest"><?php echo $role; ?></p>
+                    <p class="text-xs font-black text-slate-800"><?php echo htmlspecialchars($users); ?></p>
                 </div>
-
-                <div class="flex items-center gap-3 bg-white p-1.5 rounded-full border border-slate-100 smooth-shadow shrink-0">
-                    <div class="flex flex-col items-end px-3">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest"><?php echo $role; ?></p>
-                        <p class="text-xs font-black text-slate-800"><?php echo htmlspecialchars($users); ?></p>
-                    </div>
-                    <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 font-black text-sm border-2 border-white shadow-inner">
-                        <?php echo strtoupper(substr($users, 0, 1)); ?>
-                    </div>
+                <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 font-black text-sm border-2 border-white shadow-inner">
+                    <?php echo strtoupper(substr($users, 0, 1)); ?>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <?php
-            $today = date('Y-m-d');
-            $warning_date = date('Y-m-d', strtotime('+3 month'));
-            
-            // Logika Stok Habis
-            $q_habis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM medicines WHERE jumlah <= 0");
-            $d_habis = mysqli_fetch_assoc($q_habis);
-            if($d_habis['total'] > 0): ?>
-                <div class="bg-white border border-rose-100 p-5 rounded-[2rem] flex items-center gap-4 shadow-sm">
-                    <div class="bg-rose-500 text-white w-10 h-10 rounded-xl flex items-center justify-center animate-pulse">
-                        <i class="fas fa-exclamation-triangle text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Stok Kosong</p>
-                        <p class="text-slate-800 font-black text-sm"><?php echo $d_habis['total']; ?> Item Habis</p>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <?php
-            // Logika Stok Menipis (Di bawah 30)
-            $q_limit = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM medicines WHERE jumlah > 0 AND jumlah < 30");
-            $d_limit = mysqli_fetch_assoc($q_limit);
-            if($d_limit['total'] > 0): ?>
-                <div class="bg-white border border-orange-100 p-5 rounded-[2rem] flex items-center gap-4 shadow-sm">
-                    <div class="bg-orange-500 text-white w-10 h-10 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-layer-group text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Stok Menipis</p>
-                        <p class="text-slate-800 font-black text-sm"><?php echo $d_limit['total']; ?> Stok</p>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <?php
-            // Logika Mendekati Expired
-            $q_exp = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM medicines WHERE expired_date <= '$warning_date'");
-            $d_exp = mysqli_fetch_assoc($q_exp);
-            if($d_exp['total'] > 0): ?>
-                <div class="bg-white border border-amber-100 p-5 rounded-[2rem] flex items-center gap-4 shadow-sm">
-                    <div class="bg-amber-500 text-white w-10 h-10 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-hourglass-end text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest">Mendekati Expired</p>
-                        <p class="text-slate-800 font-black text-sm"><?php echo $d_exp['total']; ?> Item Berisiko</p>
-                    </div>
-                </div>
-            <?php endif; ?>
+        <!-- Search bar -->
+        <div class="bg-white p-4 rounded-2xl smooth-shadow border border-slate-50 mb-6 flex items-center gap-3">
+            <i class="fas fa-search text-slate-300 ml-2"></i>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama obat..." 
+                class="flex-1 outline-none text-sm font-medium text-slate-700 bg-transparent placeholder:text-slate-300">
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <!-- Form Tambah -->
             <div class="xl:col-span-1">
                 <?php if ($role != 'Kasir') : ?>
-                <div class="bg-white p-6 rounded-[2.5rem] smooth-shadow border border-slate-50 sticky top-10">
-                    <h3 class="text-xs font-black mb-6 text-slate-800 uppercase tracking-widest flex items-center gap-3">
-                        <span class="w-7 h-7 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-plus text-[10px]"></i></span>
-                        Update Gudang
-                    </h3>
-                    <form method="POST" class="space-y-4">
+                <div class="bg-white p-6 rounded-[2.5rem] smooth-shadow border border-slate-50">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xs">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <h3 class="font-black text-slate-800 text-xs uppercase tracking-widest">Tambah Obat</h3>
+                    </div>
+                    <form method="POST" class="space-y-3">
                         <div class="space-y-1">
                             <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Nama Obat</label>
-                            <input type="text" name="nama_obat" required class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
+                            <input type="text" name="nama_obat" required placeholder="Nama obat..." class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
                         </div>
-                        
                         <div class="space-y-1">
                             <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Kategori</label>
                             <select name="kategori" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition appearance-none">
                                 <option value="Obat Bebas">Obat Bebas</option>
+                                <option value="Obat Bebas Terbatas">Obat Bebas Terbatas</option>
                                 <option value="Obat Keras">Obat Keras</option>
                                 <option value="Obat Tradisional">Obat Tradisional</option>
                             </select>
                         </div>
-
                         <div class="space-y-1">
                             <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Supplier</label>
-                            <input type="text" name="supplier" required class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
+                            <input type="text" name="supplier" required placeholder="Nama PT / Distributor" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
                         </div>
-                        
                         <div class="space-y-1">
                             <label class="text-[9px] font-black text-slate-400 uppercase ml-2">WhatsApp (62...)</label>
-                            <input type="text" name="wa_supplier" required class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
+                            <input type="text" name="wa_supplier" required placeholder="628123456789" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
                         </div>
-
                         <div class="grid grid-cols-2 gap-3">
                             <div class="space-y-1">
                                 <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Stok</label>
-                                <input type="number" name="jumlah" required class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
+                                <input type="number" name="jumlah" required min="0" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs transition">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[9px] font-black text-slate-400 uppercase ml-2">Expired</label>
                                 <input type="date" name="expired" required class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-[10px] transition">
                             </div>
                         </div>
-                        
                         <button name="tambah_obat" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black hover:bg-blue-700 shadow-lg shadow-blue-100 transition active:scale-95 uppercase text-[10px] tracking-widest mt-2">
-                            Simpan Data
+                            <i class="fas fa-plus mr-1"></i> Simpan Data
                         </button>
                     </form>
                 </div>
@@ -275,6 +197,7 @@ if (isset($_GET['hapus'])) {
                 <?php endif; ?>
             </div>
 
+            <!-- Tabel Stok -->
             <div class="xl:col-span-3 bg-white rounded-[2.5rem] smooth-shadow border border-slate-50 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left" id="obatTable">
@@ -289,11 +212,13 @@ if (isset($_GET['hapus'])) {
                         <tbody class="divide-y divide-slate-50">
                             <?php
                             $res = mysqli_query($koneksi, "SELECT * FROM medicines ORDER BY id DESC");
-                            while($row = mysqli_fetch_array($res)):
-                                $tgl_exp = $row['expired_date'];
-                                $is_expired = ($tgl_exp <= $today);
-                                $is_near_exp = ($tgl_exp <= $warning_date);
-                                $is_out_of_stock = ($row['jumlah'] <= 30);
+                            if (mysqli_num_rows($res) > 0):
+                                while($row = mysqli_fetch_array($res)):
+                                    $tgl_exp       = $row['expired_date'];
+                                    $is_expired    = ($tgl_exp <= $today);
+                                    $is_near_exp   = ($tgl_exp <= $warning_date);
+                                    $is_low_stock  = ($row['jumlah'] <= 15);
+                                    $is_out        = ($row['jumlah'] <= 0);
                             ?>
                             <tr class="group hover:bg-blue-50/30 transition">
                                 <td class="p-6">
@@ -304,24 +229,28 @@ if (isset($_GET['hapus'])) {
                                     </div>
                                 </td>
                                 <td class="p-6 text-center">
-                                    <span class="inline-block px-4 py-1.5 rounded-lg font-black text-xs <?php echo $is_out_of_stock ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-700 group-hover:bg-blue-600 group-hover:text-white'; ?> transition">
-                                        <?php echo $row['jumlah']; ?>
-                                    </span>
+                                    <?php if ($is_out): ?>
+                                        <span class="inline-block px-4 py-1.5 rounded-lg font-black text-xs bg-rose-100 text-rose-600">Habis</span>
+                                    <?php elseif ($is_low_stock): ?>
+                                        <span class="inline-block px-4 py-1.5 rounded-lg font-black text-xs bg-amber-100 text-amber-600"><?php echo $row['jumlah']; ?></span>
+                                    <?php else: ?>
+                                        <span class="inline-block px-4 py-1.5 rounded-lg font-black text-xs bg-slate-100 text-slate-700 group-hover:bg-blue-600 group-hover:text-white transition"><?php echo $row['jumlah']; ?></span>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="p-6 text-center">
-                                    <span class="px-3 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-tighter <?php echo $is_expired ? 'bg-slate-900 text-white' : ($is_near_exp ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'); ?>">
+                                    <span class="px-3 py-1.5 rounded-lg font-bold text-[9px] uppercase tracking-tighter
+                                        <?php echo $is_expired ? 'bg-slate-900 text-white' : ($is_near_exp ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'); ?>">
                                         <?php echo date('d M Y', strtotime($tgl_exp)); ?>
                                     </span>
                                 </td>
                                 <td class="p-6 text-center">
                                     <div class="flex justify-center gap-2">
                                         <?php if ($role != 'Kasir') : ?>
-                                            <a href="edit_obat.php?id=<?php echo $row['id']; ?>" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition rounded-xl shadow-sm">
+                                            <a href="edit_obat.php?id=<?php echo $row['id']; ?>" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition rounded-xl shadow-sm" title="Edit">
                                                 <i class="fas fa-pen-nib text-[10px]"></i>
                                             </a>
-                                            
                                             <?php if ($role == 'Admin') : ?>
-                                            <a href="stok_obat.php?hapus=<?php echo $row['id']; ?>" onclick="return confirm('Hapus data obat ini?')" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition rounded-xl shadow-sm">
+                                            <a href="stok_obat.php?hapus=<?php echo $row['id']; ?>" onclick="return confirm('Hapus data obat ini?')" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition rounded-xl shadow-sm" title="Hapus">
                                                 <i class="fas fa-trash-alt text-[10px]"></i>
                                             </a>
                                             <?php endif; ?>
@@ -331,11 +260,25 @@ if (isset($_GET['hapus'])) {
                                     </div>
                                 </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endwhile;
+                            else: ?>
+                            <tr>
+                                <td colspan="4" class="p-16 text-center text-slate-400 font-bold uppercase tracking-widest text-[10px] italic">Belum ada data obat terdaftar.</td>
+                            </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
+
+        <!-- Legenda status -->
+        <div class="mt-6 flex flex-wrap gap-3 text-[10px] font-bold">
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-3 h-3 rounded bg-emerald-200 inline-block"></span> Stok Aman (&gt;15)</span>
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-3 h-3 rounded bg-amber-200 inline-block"></span> Stok Menipis (1–15)</span>
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-3 h-3 rounded bg-rose-200 inline-block"></span> Habis (0)</span>
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-3 h-3 rounded bg-amber-400 inline-block"></span> Exp &lt; 30 hari</span>
+            <span class="flex items-center gap-1.5 text-slate-400"><span class="w-3 h-3 rounded bg-slate-800 inline-block"></span> Sudah Kadaluarsa</span>
         </div>
 
         <footer class="mt-16 pb-6 text-center">
@@ -347,10 +290,12 @@ if (isset($_GET['hapus'])) {
     <script>
         function filterTable() {
             let input = document.getElementById("searchInput").value.toLowerCase();
-            let rows = document.querySelectorAll("#obatTable tbody tr");
+            let rows  = document.querySelectorAll("#obatTable tbody tr");
             rows.forEach(row => {
-                let name = row.querySelector(".name-target").innerText.toLowerCase();
-                row.style.display = name.includes(input) ? "" : "none";
+                let nameEl = row.querySelector(".name-target");
+                if (nameEl) {
+                    row.style.display = nameEl.innerText.toLowerCase().includes(input) ? "" : "none";
+                }
             });
         }
     </script>

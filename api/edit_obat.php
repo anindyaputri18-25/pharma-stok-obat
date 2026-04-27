@@ -1,58 +1,57 @@
 <?php
 session_start();
 include 'koneksi.php';
-include 'autentikasi.php'; 
+include 'autentikasi.php';
 
-// Proteksi: Kasir tidak boleh edit data
+// Kasir tidak boleh edit
 if (isset($role_saat_ini) && $role_saat_ini == 'Kasir') {
-    header("Location: dashboard.php");
+    header("Location: stok_obat.php");
     exit();
 }
 
 // Ambil ID dari URL
-if (isset($_GET['id'])) {
-    $id = mysqli_real_escape_string($koneksi, $_GET['id']);
-    // Pastikan query mengambil semua kolom sesuai gambar
-    $query = mysqli_query($koneksi, "SELECT * FROM medicines WHERE id = '$id'");
-    $data = mysqli_fetch_array($query);
-
-    if (!$data) {
-        header("Location: dashboard.php");
-        exit();
-    }
-} else {
-    header("Location: dashboard.php");
+if (!isset($_GET['id'])) {
+    header("Location: stok_obat.php");
     exit();
 }
 
-// --- LOGIKA UPDATE ---
+$id    = (int)$_GET['id'];
+$query = mysqli_query($koneksi, "SELECT * FROM medicines WHERE id = '$id'");
+$data  = mysqli_fetch_array($query);
+
+if (!$data) {
+    header("Location: stok_obat.php");
+    exit();
+}
+
+// Proses Update
 if (isset($_POST['update'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
-    $qty  = mysqli_real_escape_string($koneksi, $_POST['jumlah']);
-    $exp  = mysqli_real_escape_string($koneksi, $_POST['expired_date']);
+    $qty  = (int)$_POST['jumlah'];
+    $exp  = $_POST['expired_date'];
     $supp = mysqli_real_escape_string($koneksi, $_POST['supplier']);
     $wa   = mysqli_real_escape_string($koneksi, $_POST['wa_supplier']);
 
-    // Query Update sinkron dengan kolom: nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier
-    $sql = "UPDATE medicines SET 
-            nama_obat='$nama', 
-            kategori='$kat', 
-            jumlah='$qty', 
-            expired_date='$exp',
-            supplier='$supp',
-            wa_supplier='$wa' 
-            WHERE id='$id'";
-    
+    $sql = "UPDATE medicines SET
+                nama_obat    = '$nama',
+                kategori     = '$kat',
+                jumlah       = '$qty',
+                expired_date = '$exp',
+                supplier     = '$supp',
+                wa_supplier  = '$wa'
+            WHERE id = '$id'";
+
     if (mysqli_query($koneksi, $sql)) {
-        echo "<script>alert('Data Obat Berhasil Diperbarui!'); window.location='dashboard.php';</script>";
+        // Redirect ke stok_obat setelah sukses
+        echo "<script>alert('Data Obat Berhasil Diperbarui!'); window.location='stok_obat.php';</script>";
         exit();
     } else {
-        echo "<script>alert('Gagal mengupdate data: " . mysqli_error($koneksi) . "');</script>";
+        $err = mysqli_error($koneksi);
+        echo "<script>alert('Gagal mengupdate data: $err');</script>";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -70,7 +69,6 @@ if (isset($_POST['update'])) {
 
     <div class="w-full max-w-md bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200 border border-slate-100 relative overflow-hidden">
         <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-50 rounded-full"></div>
-        
         <div class="relative">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
@@ -78,14 +76,14 @@ if (isset($_POST['update'])) {
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit Obat</h2>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ID Obat: #<?php echo $data['id']; ?></p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">ID: #<?php echo $data['id']; ?></p>
                 </div>
             </div>
-            
+
             <form method="POST" class="space-y-4">
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Nama Obat</label>
-                    <input type="text" name="nama_obat" value="<?php echo htmlspecialchars($data['nama_obat']); ?>" required 
+                    <input type="text" name="nama_obat" value="<?php echo htmlspecialchars($data['nama_obat']); ?>" required
                         class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                 </div>
 
@@ -93,10 +91,10 @@ if (isset($_POST['update'])) {
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Kategori</label>
                     <div class="relative">
                         <select name="kategori" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition appearance-none cursor-pointer">
-                            <option value="Obat Bebas" <?php if($data['kategori'] == 'Obat Bebas') echo 'selected'; ?>>Obat Bebas</option>
-                            <option value="Obat Bebas Terbatas" <?php if($data['kategori'] == 'Obat Bebas Terbatas') echo 'selected'; ?>>Obat Bebas Terbatas</option>
-                            <option value="Obat Keras" <?php if($data['kategori'] == 'Obat Keras') echo 'selected'; ?>>Obat Keras</option>
-                            <option value="Obat Tradisional" <?php if($data['kategori'] == 'Obat Tradisional') echo 'selected'; ?>>Obat Tradisional</option>
+                            <option value="Obat Bebas"          <?php if($data['kategori']=='Obat Bebas')          echo 'selected'; ?>>Obat Bebas</option>
+                            <option value="Obat Bebas Terbatas" <?php if($data['kategori']=='Obat Bebas Terbatas') echo 'selected'; ?>>Obat Bebas Terbatas</option>
+                            <option value="Obat Keras"          <?php if($data['kategori']=='Obat Keras')          echo 'selected'; ?>>Obat Keras</option>
+                            <option value="Obat Tradisional"    <?php if($data['kategori']=='Obat Tradisional')    echo 'selected'; ?>>Obat Tradisional</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"></i>
                     </div>
@@ -104,7 +102,7 @@ if (isset($_POST['update'])) {
 
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Nama Supplier</label>
-                    <input type="text" name="supplier" value="<?php echo htmlspecialchars($data['supplier']); ?>" placeholder="Nama PT / Distributor" required 
+                    <input type="text" name="supplier" value="<?php echo htmlspecialchars($data['supplier']); ?>" placeholder="Nama PT / Distributor" required
                         class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                 </div>
 
@@ -112,37 +110,35 @@ if (isset($_POST['update'])) {
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">WhatsApp Supplier</label>
                     <div class="relative">
                         <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">+</span>
-                        <input type="text" name="wa_supplier" value="<?php echo htmlspecialchars($data['wa_supplier']); ?>" 
-                           placeholder="62812xxx" required 
-                           class="w-full pl-8 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
-
+                        <input type="text" name="wa_supplier" value="<?php echo htmlspecialchars($data['wa_supplier']); ?>"
+                            placeholder="62812xxx" required
+                            class="w-full pl-8 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Stok Sediaan</label>
-                        <input type="number" name="jumlah" value="<?php echo $data['jumlah']; ?>" required 
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Stok</label>
+                        <input type="number" name="jumlah" value="<?php echo $data['jumlah']; ?>" required min="0"
                             class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Tanggal Kadaluarsa</label>
-                        <input type="date" name="expired_date" value="<?php echo $data['expired_date']; ?>" required 
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-1 block">Kadaluarsa</label>
+                        <input type="date" name="expired_date" value="<?php echo $data['expired_date']; ?>" required
                             class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-xs transition">
                     </div>
                 </div>
 
                 <div class="pt-6 flex items-center gap-4">
-                    <a href="dashboard.php" class="flex-1 text-center py-4 text-slate-400 font-bold hover:text-slate-600 transition uppercase text-[10px] tracking-widest">
-                        Batal
+                    <a href="stok_obat.php" class="flex-1 text-center py-4 text-slate-400 font-bold hover:text-slate-600 transition uppercase text-[10px] tracking-widest">
+                        <i class="fas fa-arrow-left mr-1"></i> Batal
                     </a>
-                    <button name="update" class="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-black shadow-lg shadow-slate-200 hover:bg-blue-600 active:scale-95 transition uppercase text-[10px] tracking-widest">
+                    <button name="update" type="submit" class="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-black shadow-lg shadow-slate-200 hover:bg-blue-600 active:scale-95 transition uppercase text-[10px] tracking-widest">
                         Simpan <i class="fas fa-check-circle ml-1"></i>
                     </button>
                 </div>
             </form>
         </div>
     </div>
-
 </body>
 </html>
