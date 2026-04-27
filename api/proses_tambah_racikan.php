@@ -26,20 +26,15 @@ if (!isset($_POST['obat_dipilih']) || empty($_POST['obat_dipilih'])) {
 // Kode unik otomatis
 $kode_racikan = "RAC-" . strtoupper(substr(md5(time() . rand()), 0, 5));
 
-// Validasi stok mencukupi sebelum insert
 $obat_dipilih = $_POST['obat_dipilih'];
-$semua_jumlah = $_POST['jumlah_pakai'];
+$semua_jumlah = $_POST['jumlah_pakai']; // Sesuai dengan name="jumlah_pakai[ID]" di form
 
 foreach ($obat_dipilih as $id_obat) {
-    $id_obat      = (int)$id_obat;
-    $jml_digunakan = isset($semua_jumlah[$id_obat]) ? (int)$semua_jumlah[$id_obat] : 0;
-    if ($jml_digunakan <= 0) continue;
-
+    $jml_digunakan = (int)$semua_jumlah[$id_obat];
     $cek_stok = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama_obat, jumlah FROM medicines WHERE id = '$id_obat'"));
-    if ($cek_stok && $cek_stok['jumlah'] < $jml_digunakan) {
-        $nama_ob = $cek_stok['nama_obat'];
-        $sisa    = $cek_stok['jumlah'];
-        echo "<script>alert('Stok $nama_ob tidak mencukupi! Stok tersisa: $sisa, dibutuhkan: $jml_digunakan.'); window.history.back();</script>";
+    
+    if ($cek_stok['jumlah'] < $jml_digunakan) {
+        echo "<script>alert('Stok ".$cek_stok['nama_obat']." tidak cukup!'); window.history.back();</script>";
         exit();
     }
 }

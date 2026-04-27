@@ -214,13 +214,9 @@ if (!in_array($role, $role_boleh)) {
 
     <script>
         async function muatDataBPS() {
-            const tableContainer = document.getElementById('bpsTableContainer');
-            const tableContent = document.getElementById('bpsTableContent');
-
             try {
-                // 1. Panggil API BPS
-                const response = await fetch('api_bps.php');
-                const result = await response.json();
+                const response = await fetch('api_bps.php'); // Jika analisis.php & api_bps.php di satu folder
+                const data = await response.json();
 
                 // 2. Cek apakah status OK
                 if (result.status === "OK") {
@@ -250,8 +246,7 @@ if (!in_array($role, $role_boleh)) {
                     tableContent.innerHTML = "<p class='text-red-500'>API BPS mengembalikan error.</p>";
                 }
             } catch (error) {
-                console.error("Gagal memanggil API:", error);
-                tableContent.innerHTML = "<p class='text-red-500'>Gagal terhubung ke server / API BPS.</p>";
+                console.error("Error:", error);
             }
         }
 

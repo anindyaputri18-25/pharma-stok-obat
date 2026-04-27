@@ -1,9 +1,7 @@
 <?php
-session_start();
 include 'koneksi.php';
 include 'autentikasi.php';
 
-// FIX: autentikasi.php mendefinisikan $role_saat_ini, bukan $role
 if (!isset($role_saat_ini)) {
     header("Location: login.php");
     exit();
@@ -11,7 +9,6 @@ if (!isset($role_saat_ini)) {
 
 $role = $role_saat_ini;
 
-// Kalau bukan Pending, redirect sesuai role
 if ($role != 'Pending') {
     if ($role == 'Kasir') {
         header("Location: kasir_dashboard.php");
@@ -21,7 +18,8 @@ if ($role != 'Pending') {
     exit();
 }
 
-$user_session = $_SESSION['users'];
+// Ambil dari Cookie agar nama muncul
+$user_session = $_COOKIE['users'] ?? 'User'; 
 ?>
 <!DOCTYPE html>
 <html lang="id">

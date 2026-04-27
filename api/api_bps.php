@@ -19,17 +19,14 @@ $url = "https://webapi.bps.go.id/v1/api/view/domain/0000/model/statictable/lang/
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Penting kalau di localhost
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Tambahkan baris ini
 curl_close($ch);
 
 if ($httpCode !== 200) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Gagal mengambil data dari server BPS."
-    ]);
+    echo json_encode(["status" => "error", "message" => "Gagal ambil data BPS"]);
     exit();
 }
-// Kirim apa adanya ke JavaScript
 echo $response;
 ?>

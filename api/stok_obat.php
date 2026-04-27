@@ -10,10 +10,10 @@ $today        = date('Y-m-d');
 $warning_date = date('Y-m-d', strtotime('+30 days'));
 
 if (isset($_POST['tambah_obat'])) {
-    if ($role == 'Kasir') { //
-        echo "<script>alert('Akses Ditolak!'); window.location='stok_obat.php';</script>";
-        exit();
-    }
+    $exp  = $_POST['expired']; // Pastikan di form input name="expired"
+
+    $query = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
+              VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
 
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
