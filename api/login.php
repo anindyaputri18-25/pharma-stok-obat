@@ -2,13 +2,15 @@
 session_start();
 include 'koneksi.php';
 
-// Cek jika sudah login
+// Cek jika sudah login, langsung lempar ke dashboard masing-masing
 if (isset($_SESSION['users'])) {
-    if ($_SESSION['role'] === 'Pending') {
+    $role = $_SESSION['role'];
+    if ($role === 'Pending') {
         header("Location: pending.php");
-    } elseif ($_SESSION['role'] === 'Kasir') {
+    } elseif ($role === 'Kasir') {
         header("Location: kasir_dashboard.php");
     } else {
+        // Admin, Apoteker, dan Manager Gudang masuk ke dashboard utama
         header("Location: dashboard.php");
     }
     exit();
@@ -17,9 +19,11 @@ if (isset($_SESSION['users'])) {
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Menggunakan variabel $koneksi sesuai dengan yang ada di file koneksi.php kamu
     $username = mysqli_real_escape_string($koneksi, trim($_POST['username']));
     $password = trim($_POST['password']);
 
+    // Persiapkan query dengan bind_param untuk keamanan (SQL Injection Protection)
     $stmt = $koneksi->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -28,17 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows > 0) {
         $data = $result->fetch_assoc();
 
+        // Verifikasi password (asumsi password di database sudah di-hash dengan password_hash)
         if (password_verify($password, $data['password'])) {
+            // Set session data
             $_SESSION['users'] = $data['username'];
             $_SESSION['role']  = $data['role'];
 
             session_regenerate_id(true);
 
-            if ($data['role'] === 'Pending') {
+            // LOGIKA REDIRECTION BERDASARKAN ROLE
+            $role = $data['role'];
+            if ($role === 'Pending') {
                 header("Location: pending.php");
-            } elseif ($data['role'] === 'Kasir') {
+            } elseif ($role === 'Kasir') {
                 header("Location: kasir_dashboard.php");
+            } elseif (in_array($role, ['Admin', 'Apoteker', 'Manager Gudang'])) {
+                header("Location: dashboard.php");
             } else {
+                // Default jika role tidak dikenal
                 header("Location: dashboard.php");
             }
             exit();
