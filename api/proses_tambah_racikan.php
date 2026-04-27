@@ -55,12 +55,15 @@ foreach ($obat_dipilih as $id_obat) {
     $jml_digunakan = isset($semua_jumlah[$id_obat]) ? (int)$semua_jumlah[$id_obat] : 0;
     if ($jml_digunakan <= 0) continue;
 
-    // Insert detail
-    $sql_detail = "INSERT INTO racikan_detail (id_racikan, id_obat, jumlah_digunakan)
-                   VALUES ('$id_racikan_baru', '$id_obat', '$jml_digunakan')";
-    mysqli_query($koneksi, $sql_detail);
+    // Baris 46 - Pastikan query insert detail lengkap
+    $sql_detail = "INSERT INTO racikan_detail (id_racikan, id_obat, jumlah_digunakan) 
+                VALUES ('$id_racikan_baru', '$id_obat', '$jml_digunakan')";
 
-    // Kurangi stok
+    if (!mysqli_query($koneksi, $sql_detail)) {
+        echo "<script>alert('Gagal menyimpan detail bahan: " . mysqli_error($koneksi) . "');</script>";
+    }
+
+    // Update stok obat di tabel medicines setelah racikan dibuat
     mysqli_query($koneksi, "UPDATE medicines SET jumlah = jumlah - $jml_digunakan WHERE id = '$id_obat'");
 }
 

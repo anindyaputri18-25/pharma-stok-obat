@@ -2,15 +2,20 @@
 include 'koneksi.php';
 include 'autentikasi.php';
 
-if (!isset($role_saat_ini)) {
-    header("Location: login.php");
-    exit();
-}
+$users = $_COOKIE['users'];
 
-$role = $role_saat_ini;
+// AMBIL STATUS TERBARU DARI DATABASE
+$query_cek = mysqli_query($koneksi, "SELECT role FROM users WHERE username = '$users'");
+$data_baru = mysqli_fetch_array($query_cek);
+$role_terbaru = $data_baru['role'];
 
-if ($role != 'Pending') {
-    if ($role == 'Kasir') {
+// Jika admin sudah mengubah role dari 'Pending' ke role lain
+if ($role_terbaru != 'Pending') {
+    // Update cookie agar sinkron
+    setcookie('role', $role_terbaru, time() + 86400, "/");
+    
+    // Redirect otomatis ke dashboard sesuai role baru
+    if ($role_terbaru == 'Kasir') {
         header("Location: kasir_dashboard.php");
     } else {
         header("Location: dashboard.php");
@@ -18,9 +23,9 @@ if ($role != 'Pending') {
     exit();
 }
 
-// Ambil dari Cookie agar nama muncul
-$user_session = $_COOKIE['users'] ?? 'User'; 
+$user_session = $users;
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

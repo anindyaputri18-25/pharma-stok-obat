@@ -18,7 +18,7 @@ if (isset($_POST['tambah_obat'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
     $qty  = (int)$_POST['jumlah'];
-    $exp  = $_POST['expired'];
+    $exp  = $_POST['expired']; // Sesuaikan dengan name="expired" di form HTML
     $supp = mysqli_real_escape_string($koneksi, $_POST['supplier']);
     $wa   = mysqli_real_escape_string($koneksi, $_POST['wa_supplier']);
 
@@ -28,12 +28,11 @@ if (isset($_POST['tambah_obat'])) {
         exit();
     }
 
-    $sql = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier)
-            VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
+    $query_insert = "INSERT INTO medicines (nama_obat, kategori, jumlah, expired_date, supplier, wa_supplier) 
+                    VALUES ('$nama', '$kat', '$qty', '$exp', '$supp', '$wa')";
 
-    if (mysqli_query($koneksi, $sql)) {
-        echo "<script>alert('Obat baru berhasil disimpan!'); window.location='stok_obat.php';</script>";
-        exit();
+    if (mysqli_query($koneksi, $query_insert)) {
+        echo "<script>alert('Data obat berhasil ditambahkan!'); window.location='stok_obat.php';</script>";
     } else {
         echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
     }
