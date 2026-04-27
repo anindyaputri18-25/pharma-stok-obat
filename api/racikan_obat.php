@@ -1,20 +1,14 @@
 <?php
-session_start();
 include 'koneksi.php';
-include 'autentikasi.php';
+include 'autentikasi.php'; //
 
-if (!isset($_SESSION['users'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$users = $_SESSION['users'];
+// Konsistensi data user
+$users = $_COOKIE['users'] ?? 'Guest';
 $role  = $role_saat_ini;
 
-// Hanya Admin dan Apoteker
-$role_boleh = ['Admin', 'Apoteker'];
+$role_boleh = ['Admin', 'Apoteker']; //
 if (!in_array($role, $role_boleh)) {
-    echo "<script>alert('Akses Ditolak! Menu Racikan hanya untuk Apoteker.'); window.location='dashboard.php';</script>";
+    echo "<script>alert('Akses Ditolak!'); window.location='dashboard.php';</script>";
     exit();
 }
 

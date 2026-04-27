@@ -2,6 +2,8 @@
 session_start();
 include 'koneksi.php';
 include 'autentikasi.php';
+$role = $role_saat_ini;
+$users = $_COOKIE['users'];
 
 $role_boleh = ['Admin', 'Apoteker'];
 if (!in_array($role_saat_ini, $role_boleh)) {

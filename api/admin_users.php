@@ -1,18 +1,18 @@
 <?php
-session_start();
 include 'koneksi.php';
 include 'autentikasi.php';
 
+// Pastikan hanya Admin yang bisa akses
 if ($role_saat_ini != 'Admin') {
     header("Location: dashboard.php");
     exit();
 }
 
-$user_aktif = $_SESSION['users'];
+// Konsistensi data user dari Cookie
+$user_aktif = $_COOKIE['users'] ?? 'Admin';
 $role       = $role_saat_ini;
 
-// Update Role — FIX: form pakai name="user_id" tapi POST diambil sebagai $_POST['id']
-// Sekarang konsisten pakai name="id"
+// Update Role
 if (isset($_POST['update_role'])) {
     $id       = (int)$_POST['id'];
     $new_role = mysqli_real_escape_string($koneksi, $_POST['role']);
@@ -29,6 +29,7 @@ if (isset($_GET['hapus'])) {
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

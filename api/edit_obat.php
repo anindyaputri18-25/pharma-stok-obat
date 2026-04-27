@@ -1,15 +1,17 @@
 <?php
-session_start();
 include 'koneksi.php';
 include 'autentikasi.php';
 
-// Kasir tidak boleh edit
+// Kasir tidak boleh edit, gunakan variabel dari autentikasi.php
 if (isset($role_saat_ini) && $role_saat_ini == 'Kasir') {
     header("Location: stok_obat.php");
     exit();
 }
 
-// Ambil ID dari URL
+// Konsistensi data user untuk header
+$users = $_COOKIE['users'] ?? 'Guest';
+$role  = $role_saat_ini;
+
 if (!isset($_GET['id'])) {
     header("Location: stok_obat.php");
     exit();
@@ -24,7 +26,7 @@ if (!$data) {
     exit();
 }
 
-// Proses Update
+// Proses Update tetap menggunakan mysqli_real_escape_string untuk keamanan
 if (isset($_POST['update'])) {
     $nama = mysqli_real_escape_string($koneksi, $_POST['nama_obat']);
     $kat  = mysqli_real_escape_string($koneksi, $_POST['kategori']);
@@ -33,25 +35,23 @@ if (isset($_POST['update'])) {
     $supp = mysqli_real_escape_string($koneksi, $_POST['supplier']);
     $wa   = mysqli_real_escape_string($koneksi, $_POST['wa_supplier']);
 
-    $sql = "UPDATE medicines SET
-                nama_obat    = '$nama',
-                kategori     = '$kat',
-                jumlah       = '$qty',
-                expired_date = '$exp',
-                supplier     = '$supp',
-                wa_supplier  = '$wa'
+    $sql = "UPDATE medicines SET 
+                nama_obat    = '$nama', 
+                kategori     = '$kat', 
+                jumlah       = '$qty', 
+                expired_date = '$exp', 
+                supplier     = '$supp', 
+                wa_supplier  = '$wa' 
             WHERE id = '$id'";
-
+    
     if (mysqli_query($koneksi, $sql)) {
-        // Redirect ke stok_obat setelah sukses
-        echo "<script>alert('Data Obat Berhasil Diperbarui!'); window.location='stok_obat.php';</script>";
-        exit();
+        echo "<script>alert('Data berhasil diupdate!'); window.location='stok_obat.php';</script>";
     } else {
-        $err = mysqli_error($koneksi);
-        echo "<script>alert('Gagal mengupdate data: $err');</script>";
+        echo "<script>alert('Gagal update data!');</script>";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>

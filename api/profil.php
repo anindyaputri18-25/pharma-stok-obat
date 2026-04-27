@@ -1,10 +1,9 @@
 <?php
-session_start();
 include 'koneksi.php';
-include 'autentikasi.php'; 
+include 'autentikasi.php'; // Ini akan otomatis mendefinisikan $role_saat_ini dan $users
 
-$users = $_SESSION['users'];
-$role = $role_saat_ini; 
+$users = $_COOKIE['users']?? ''; // Ambil dari cookie
+$role  = $role_saat_ini;    // Ambil dari variabel di autentikasi.php
 
 $query = mysqli_query($koneksi, "SELECT * FROM users WHERE username = '$users'");
 $data_user = mysqli_fetch_array($query);

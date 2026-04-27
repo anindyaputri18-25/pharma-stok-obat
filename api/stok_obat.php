@@ -1,19 +1,17 @@
 <?php
-session_start();
 include 'koneksi.php';
-include 'autentikasi.php';
+include 'autentikasi.php'; //
 
-$users = $_SESSION['users'];
+// Ambil data dari Cookie agar konsisten
+$users = $_COOKIE['users'] ?? 'Guest';
 $role  = $role_saat_ini;
 
-// FIX: variabel tanggal yang hilang di versi original
 $today        = date('Y-m-d');
 $warning_date = date('Y-m-d', strtotime('+30 days'));
 
-// Tambah obat
 if (isset($_POST['tambah_obat'])) {
-    if ($role == 'Kasir') {
-        echo "<script>alert('Akses Ditolak! Role Anda tidak diizinkan menambah data.'); window.location='stok_obat.php';</script>";
+    if ($role == 'Kasir') { //
+        echo "<script>alert('Akses Ditolak!'); window.location='stok_obat.php';</script>";
         exit();
     }
 

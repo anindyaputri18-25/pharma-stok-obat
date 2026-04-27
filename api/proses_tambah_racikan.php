@@ -1,10 +1,8 @@
 <?php
-session_start();
 include 'koneksi.php';
-include 'autentikasi.php';
+include 'autentikasi.php'; //
 
-// Hanya Admin dan Apoteker yang boleh
-if (!in_array($role_saat_ini, ['Admin', 'Apoteker'])) {
+if (!in_array($role_saat_ini, ['Admin', 'Apoteker'])) { //
     header("Location: dashboard.php");
     exit();
 }

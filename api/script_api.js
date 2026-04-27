@@ -1,6 +1,3 @@
-/**
- * Fungsi untuk mengambil data dari API BPS (api_bps.php)
- */
 async function ambilDataAPI() {
     const url = 'api/api_bps.php'; // Pastikan file ini ada di folder yang sama
 

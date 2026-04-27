@@ -1,14 +1,13 @@
 <?php
-session_start();
 include 'koneksi.php';
-include 'autentikasi.php';
+include 'autentikasi.php'; // Ini akan otomatis mendefinisikan $role_saat_ini dan $users
 
-$users = $_SESSION['users'];
-$role = $role_saat_ini;
+$users = $_COOKIE['users']; // Ambil dari cookie
+$role  = $role_saat_ini;    // Ambil dari variabel di autentikasi.php
 
-// Proteksi Akses
-if ($role == 'Pending' || !in_array($role, ['Admin', 'Manager Gudang', 'Apoteker', 'Kasir'])) {
-    header("Location: dashboard.php");
+$role_boleh = ['Admin', 'Manager Gudang'];
+if (!in_array($role, $role_boleh)) {
+    echo "<script>alert('Akses Ditolak!'); window.location='dashboard.php';</script>";
     exit();
 }
 ?>

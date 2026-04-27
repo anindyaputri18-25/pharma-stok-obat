@@ -1,15 +1,13 @@
 <?php
-session_start();
 include 'koneksi.php';
 include 'autentikasi.php';
 
-// FIX: $role_saat_ini dari autentikasi.php, bukan $role
 if (!isset($role_saat_ini) || $role_saat_ini != 'Kasir') {
     header("Location: dashboard.php");
     exit();
 }
 
-$users = $_SESSION['users'];
+$users = $_COOKIE['users'];
 $role  = $role_saat_ini;
 
 // Statistik stok

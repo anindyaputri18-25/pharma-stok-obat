@@ -1,6 +1,16 @@
 <?php
+include 'koneksi';
+include 'autentikasi.php';
 // api_bps.php
 header('Content-Type: application/json');
+
+if (!isset($users)) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Akses ditolak. Silakan login terlebih dahulu."
+    ]);
+    exit();
+}
 
 // Ganti [API_KEY_KAMU] dengan API Key asli dari web BPS
 $apiKey = "4f09e29b052cee2e8ed7436cefb94c4c"; 
@@ -13,6 +23,13 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Penting kalau di localhost
 $response = curl_exec($ch);
 curl_close($ch);
 
+if ($httpCode !== 200) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Gagal mengambil data dari server BPS."
+    ]);
+    exit();
+}
 // Kirim apa adanya ke JavaScript
 echo $response;
 ?>
