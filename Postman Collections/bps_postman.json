@@ -28,7 +28,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "https://webapi.bps.go.id/v1/api/view/domain/0000/model/statictable/lang/ind/id/1619/key/4f09e29b052cee2e8ed7436cefb94c4c/",
+				"url": "https://webapi.bps.go.id/v1/api/view/domain/0000/model/statictable/lang/ind/id/1619/key/4f09e29b052cee2e8ed7436cefb94c4c",
 				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
 			},
 			"response": []
