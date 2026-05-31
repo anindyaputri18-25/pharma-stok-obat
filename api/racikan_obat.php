@@ -19,7 +19,11 @@ if (isset($_GET['pesan'])) {
     if ($_GET['pesan'] === 'error')    $pesan = 'error:Gagal menghapus racikan.';
 }
 
-$ap_where     = $id_apotek ? "WHERE r.id_apotek='$id_apotek'" : "";
+$cek_kolom = mysqli_query($koneksi, "SHOW COLUMNS FROM `racikan` LIKE 'id_apotek'");
+$has_id_apotek = mysqli_num_rows($cek_kolom) > 0;
+
+$ap_where = ($id_apotek && $has_id_apotek) ? "WHERE r.id_apotek='$id_apotek'" : "";
+
 $total_racikan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) c FROM racikan r $ap_where"))['c'];
 ?>
 <!DOCTYPE html>

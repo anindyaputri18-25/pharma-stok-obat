@@ -29,13 +29,15 @@ $active_cls  = ($role === 'Super Admin')
     ? 'bg-amber-400 text-slate-900 shadow-xl'
     : 'bg-blue-600 text-white shadow-xl shadow-blue-100';
 
-function nav_link($href, $icon, $label, $current, $base, $active) {
-    $is = (basename($current) === basename($href));
-    $cls = $is ? $active : $base;
-    return "<a href=\"$href\" class=\"flex items-center justify-center md:justify-start p-3 $cls rounded-xl transition\">
-        <i class=\"fas $icon w-5 text-center\"></i>
-        <span class=\"hidden md:inline ml-3\">$label</span>
-    </a>";
+if (!function_exists('nav_link')) {
+    function nav_link($href, $icon, $label, $current, $base, $active) {
+        $is = (basename($current) === basename($href));
+        $cls = $is ? $active : $base;
+        return "<a href=\"$href\" class=\"flex items-center justify-center md:justify-start p-3 $cls rounded-xl transition\">
+            <i class=\"fas $icon w-5 text-center\"></i>
+            <span class=\"hidden md:inline ml-3\">$label</span>
+        </a>";
+    }
 }
 ?>
 <aside class="w-20 md:w-64 <?php echo $sidebar_bg; ?> border-r flex flex-col items-center py-8 sticky top-0 h-screen z-50">
