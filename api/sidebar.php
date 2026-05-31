@@ -1,9 +1,4 @@
 <?php
-/**
- * sidebar.php — Komponen sidebar universal
- * Include setelah koneksi.php + autentikasi.php + log_aktivitas.php
- * Variabel yang dibutuhkan: $role, $users, $current_page (basename file)
- */
 $current_page = basename($_SERVER['PHP_SELF']);
 
 // Ikon & warna per role

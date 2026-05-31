@@ -1,8 +1,8 @@
 <?php
 session_start();
-include 'koneksi.php';
-include 'autentikasi.php';
-include 'log_aktivitas.php';
+include_once 'koneksi.php';
+include_once 'autentikasi.php';
+include_once 'log_aktivitas.php';
 
 if (!isset($role_saat_ini)) { header("Location: login.php"); exit(); }
 if ($role_saat_ini === 'Pending')     { header("Location: pending.php"); exit(); }
@@ -46,6 +46,10 @@ $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
         .fade-up-1{animation-delay:0.1s;opacity:0;}
         .fade-up-2{animation-delay:0.2s;opacity:0;}
         .fade-up-3{animation-delay:0.3s;opacity:0;}
+
+        aside ~ aside {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="text-slate-800 flex min-h-screen">
