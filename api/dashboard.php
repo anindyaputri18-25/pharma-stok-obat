@@ -26,7 +26,7 @@ $role_icon_map = [
     'Kasir'          => ['fa-cash-register', 'orange'],
 ];
 $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
-include 'sidebar.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
