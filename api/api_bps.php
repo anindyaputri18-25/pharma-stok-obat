@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * api_bps.php — Proxy ke API BPS dengan error handling lengkap
+ * Endpoint: webapi.bps.go.id/v1/api/view
+ * Cara update key: Login ke https://webapi.bps.go.id → menu Key API → copy key
+ */
 include 'koneksi.php';
 include 'autentikasi.php';
 
@@ -15,6 +19,10 @@ if ($role_saat_ini === 'Pending') {
     exit();
 }
 
+// =====================================================
+// GANTI API KEY DI SINI
+// Cara: Login ke https://webapi.bps.go.id → Key API
+// =====================================================
 $apiKey = "4f09e29b052cee2e8ed7436cefb94c4c";
 
 // ID tabel BPS: 1619 = Persentase Penduduk Keluhan Kesehatan & Obat
@@ -99,4 +107,5 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit();
 }
 
+// Sukses — teruskan ke frontend
 echo $response;

@@ -19,12 +19,13 @@ if (isset($_GET['pesan'])) {
     if ($_GET['pesan'] === 'error')    $pesan = 'error:Gagal menghapus racikan.';
 }
 
-$cek_kolom = mysqli_query($koneksi, "SHOW COLUMNS FROM `racikan` LIKE 'id_apotek'");
+// Safety check: kolom id_apotek mungkin belum ada di DB lama
+$cek_kolom    = mysqli_query($koneksi, "SHOW COLUMNS FROM `racikan` LIKE 'id_apotek'");
 $has_id_apotek = mysqli_num_rows($cek_kolom) > 0;
+$ap_where      = ($id_apotek && $has_id_apotek) ? "WHERE r.id_apotek='$id_apotek'" : "";
 
-$ap_where = ($id_apotek && $has_id_apotek) ? "WHERE r.id_apotek='$id_apotek'" : "";
-
-$total_racikan = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) c FROM racikan r $ap_where"))['c'];
+$total_racikan = mysqli_fetch_assoc(mysqli_query($koneksi,
+    "SELECT COUNT(*) c FROM racikan r $ap_where"))['c'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -53,7 +54,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f4f7fe;font-size:13p
     <p class="text-purple-600 font-extrabold text-[9px] uppercase tracking-[0.3em] mb-1">
       <?php echo htmlspecialchars($apotek['nama_apotek'] ?? 'Pharmacist Compounding'); ?>
     </p>
-    <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none italic">Daftar <span class="text-purple-600">Racikan.</span></h1>
+    <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none italic">
+      Daftar <span class="text-purple-600">Racikan.</span>
+    </h1>
   </div>
   <div class="flex items-center gap-4">
     <div class="flex items-center gap-3 bg-white p-1.5 rounded-full border border-slate-100 smooth-shadow shrink-0">
@@ -80,7 +83,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f4f7fe;font-size:13p
     </div>
     <div>
       <h2 class="text-2xl font-black italic mb-1">Racikan Obat</h2>
-      <p class="text-purple-100 text-xs font-medium opacity-90">Kelola formula dan komposisi racikan untuk setiap resep pasien.</p>
+      <p class="text-purple-100 text-xs font-medium opacity-90">
+        Kelola formula dan komposisi racikan untuk setiap resep pasien.
+      </p>
     </div>
   </div>
   <i class="fas fa-flask absolute -right-8 -bottom-8 text-[10rem] opacity-10"></i>
@@ -109,7 +114,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f4f7fe;font-size:13p
   </div>
 </div>
 
-<!-- TABEL RACIKAN -->
+<!-- TABEL -->
 <div class="bg-white rounded-[2rem] smooth-shadow border border-slate-50 overflow-hidden fade-up">
   <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
@@ -125,8 +130,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f4f7fe;font-size:13p
       </thead>
       <tbody class="divide-y divide-slate-50">
         <?php
-        $query = mysqli_query($koneksi,
-            "SELECT * FROM racikan r $ap_where ORDER BY id_racikan DESC");
+        $query = mysqli_query($koneksi, "SELECT * FROM racikan r $ap_where ORDER BY id_racikan DESC");
         if (mysqli_num_rows($query) > 0):
           while ($data = mysqli_fetch_assoc($query)):
             $id_r    = $data['id_racikan'];

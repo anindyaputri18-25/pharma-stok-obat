@@ -1,4 +1,10 @@
 <?php
+/**
+ * log_aktivitas.php
+ * Helper: catat setiap aksi user ke tabel activity_log
+ * Include file ini setelah koneksi.php & autentikasi.php
+ */
+
 function catat_log($koneksi, $aksi, $detail = '', $id_apotek = null) {
     $username   = $_COOKIE['users'] ?? 'Publik';
     $role       = $_COOKIE['role']  ?? 'Publik';
@@ -17,6 +23,9 @@ function catat_log($koneksi, $aksi, $detail = '', $id_apotek = null) {
     );
 }
 
+/**
+ * Ambil id_apotek user yang sedang login dari tabel users
+ */
 function get_id_apotek_user($koneksi) {
     if (!isset($_COOKIE['users'])) return null;
     $username = mysqli_real_escape_string($koneksi, $_COOKIE['users']);
@@ -24,6 +33,9 @@ function get_id_apotek_user($koneksi) {
     return $res['id_apotek'] ?? null;
 }
 
+/**
+ * Ambil data apotek berdasarkan id
+ */
 function get_apotek($koneksi, $id_apotek) {
     if (!$id_apotek) return null;
     $id = (int)$id_apotek;

@@ -8,6 +8,7 @@ $role        = $role_saat_ini;
 
 if ($role !== 'Super Admin') { header("Location: dashboard.php"); exit(); }
 
+// UPDATE ROLE & APOTEK USER
 if (isset($_POST['update_user'])) {
     $id         = (int)$_POST['id'];
     $new_role   = mysqli_real_escape_string($koneksi, $_POST['role']);
@@ -18,6 +19,7 @@ if (isset($_POST['update_user'])) {
     $pesan = 'success:User berhasil diperbarui!';
 }
 
+// HAPUS USER
 if (isset($_GET['hapus'])) {
     $id    = (int)$_GET['hapus'];
     $uname = mysqli_fetch_assoc(mysqli_query($koneksi,"SELECT username FROM users WHERE id='$id'"))['username'] ?? '-';

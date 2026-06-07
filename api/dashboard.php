@@ -1,15 +1,15 @@
 <?php
 session_start();
-include_once 'koneksi.php';
-include_once 'autentikasi.php';
-include_once 'log_aktivitas.php';
+include 'koneksi.php';
+include 'autentikasi.php';
+include 'log_aktivitas.php';
 
 if (!isset($role_saat_ini)) { header("Location: login.php"); exit(); }
 if ($role_saat_ini === 'Pending')     { header("Location: pending.php"); exit(); }
 if ($role_saat_ini === 'Kasir')       { header("Location: kasir_dashboard.php"); exit(); }
 if ($role_saat_ini === 'Super Admin') { header("Location: super_admin_dashboard.php"); exit(); }
 
-$users     = $_COOKIE['users'] ?? 'Guest';
+$users     = $_COOKIE['users'];
 $role      = $role_saat_ini;
 $id_apotek = get_id_apotek_user($koneksi);
 $apotek    = get_apotek($koneksi, $id_apotek);
@@ -26,6 +26,7 @@ $role_icon_map = [
     'Kasir'          => ['fa-cash-register', 'orange'],
 ];
 $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
+include 'sidebar.php';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -46,18 +47,15 @@ $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
         .fade-up-1{animation-delay:0.1s;opacity:0;}
         .fade-up-2{animation-delay:0.2s;opacity:0;}
         .fade-up-3{animation-delay:0.3s;opacity:0;}
-
-        aside ~ aside {
-            display: none !important;
-        }
     </style>
 </head>
 <body class="text-slate-800 flex min-h-screen">
 
-<?php include_once 'sidebar.php'; ?>
+<?php include 'sidebar.php'; ?>
 
 <main class="flex-1 p-6 md:p-10 lg:p-12 max-w-[1600px] mx-auto w-full">
 
+    <!-- HEADER -->
     <header class="flex justify-between items-center mb-10 fade-up fade-up-1">
         <div>
             <p class="text-blue-600 font-extrabold text-[9px] uppercase tracking-[0.3em] mb-1">
@@ -78,6 +76,7 @@ $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
         </div>
     </header>
 
+    <!-- HERO BANNER -->
     <div class="hero-bg relative overflow-hidden p-10 md:p-12 rounded-[3rem] text-white mb-10 smooth-shadow fade-up fade-up-1">
         <div class="relative z-10">
             <span class="bg-white/20 border border-white/20 text-[9px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest mb-4 inline-block backdrop-blur">
@@ -89,16 +88,17 @@ $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
         <i class="fas fa-laptop-medical absolute -right-10 -bottom-10 text-[15rem] opacity-10 rotate-12"></i>
     </div>
 
+    <!-- STAT CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 fade-up fade-up-2">
         <?php
         $stats = [
-            ['val'=>$stok_aman,    'label'=>'Stok Aman',   'icon'=>'fa-check-circle',        'bg_cls'=>'bg-emerald-50', 'text_cls'=>'text-emerald-500', 'h_cls'=>'group-hover:bg-emerald-500'],
-            ['val'=>$stok_menipis, 'label'=>'Stok Menipis','icon'=>'fa-hourglass-half',     'bg_cls'=>'bg-amber-50',   'text_cls'=>'text-amber-500',   'h_cls'=>'group-hover:bg-amber-500'],
-            ['val'=>$stok_habis,   'label'=>'Out of Stock', 'icon'=>'fa-exclamation-triangle','bg_cls'=>'bg-rose-50',    'text_cls'=>'text-rose-500',    'h_cls'=>'group-hover:bg-rose-500'],
+            ['val'=>$stok_aman,    'label'=>'Stok Aman',   'icon'=>'fa-check-circle',      'color'=>'emerald'],
+            ['val'=>$stok_menipis, 'label'=>'Stok Menipis','icon'=>'fa-hourglass-half',     'color'=>'amber'],
+            ['val'=>$stok_habis,   'label'=>'Out of Stock', 'icon'=>'fa-exclamation-triangle','color'=>'rose'],
         ];
         foreach($stats as $s): ?>
         <div class="card-hover bg-white p-8 rounded-[2.5rem] smooth-shadow border border-slate-50 flex flex-col items-center text-center group">
-            <div class="w-16 h-16 <?php echo $s['bg_cls']; ?> <?php echo $s['text_cls']; ?> rounded-2xl flex items-center justify-center mb-4 <?php echo $s['h_cls']; ?> group-hover:text-white transition-all duration-200">
+            <div class="w-16 h-16 bg-<?php echo $s['color']; ?>-50 text-<?php echo $s['color']; ?>-500 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-<?php echo $s['color']; ?>-500 group-hover:text-white">
                 <i class="fas <?php echo $s['icon']; ?> text-2xl"></i>
             </div>
             <h4 class="text-4xl font-black text-slate-800 mb-1"><?php echo $s['val']; ?></h4>
@@ -107,6 +107,7 @@ $ri = $role_icon_map[$role] ?? ['fa-user','slate'];
         <?php endforeach; ?>
     </div>
 
+    <!-- QUICK ACCESS GRID -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-up fade-up-3">
         <?php
         $menu = [
