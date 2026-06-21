@@ -14,8 +14,8 @@
 					"script": {
 						"id": "e93086c1-9457-4f39-9174-48838a8276e2",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
 							"});"
 						],
 						"type": "text/javascript",
@@ -41,7 +41,16 @@
 						"disabled": true
 					}
 				],
-				"url": "http://127.0.0.1:8110/api/register",
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\":\"Admin Panen\",\"email\":\"admin@panen.com\",\"password\":\"rahasia123\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8110/api/register",
 				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
 			},
 			"response": []
